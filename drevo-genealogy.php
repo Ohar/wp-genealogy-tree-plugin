@@ -3,7 +3,12 @@
  * Plugin Name: Drevo Genealogy Trees
  * Description: Uploads static genealogy HTML exports as isolated packages and renders them via shortcode.
  * Version: 0.1.0
- * Author: Ohar / Codex
+ * Requires at least: 6.0
+ * Requires PHP: 7.4
+ * Author: Ohar <code@ohar.name>
+ * License: MIT
+ * License URI: https://opensource.org/license/mit/
+ * Text Domain: drevo-genealogy
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,6 +38,7 @@ final class Drevo_Genealogy_Trees {
 		add_action( 'admin_post_drevo_genealogy_register_existing', array( $this, 'handle_register_existing' ) );
 		add_shortcode( self::SHORTCODE, array( $this, 'render_shortcode' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_assets' ) );
+		add_action( 'admin_init', array( $this, 'add_privacy_policy_content' ) );
 		register_activation_hook( __FILE__, array( __CLASS__, 'activate' ) );
 	}
 
@@ -68,6 +74,21 @@ final class Drevo_Genealogy_Trees {
 			$version,
 			true
 		);
+	}
+
+	/**
+	 * Adds suggested privacy-policy text for site administrators.
+	 */
+	public function add_privacy_policy_content() {
+		if ( ! function_exists( 'wp_add_privacy_policy_content' ) ) {
+			return;
+		}
+
+		$content = '<p class="privacy-policy-tutorial"><strong>Administrator action required:</strong> review this text, the imported files, and the applicable privacy requirements before publishing a genealogy tree.</p>';
+		$content .= '<p>This site may publish genealogy-tree files uploaded by its administrator. The files can contain names, family relationships, dates, photographs, locations and other personal information. They are stored in <code>wp-content/genealogy/</code> and may be publicly accessible.</p>';
+		$content .= '<p>The Drevo Genealogy Trees plugin itself does not send imported data to its author or to external services. The administrator is responsible for reviewing every imported file, obtaining any required permissions, and removing files when they should no longer be public. The plugin\'s optional filtering is not a guarantee of anonymization.</p>';
+
+		wp_add_privacy_policy_content( 'Drevo Genealogy Trees', wp_kses_post( wpautop( $content, false ) ) );
 	}
 
 	public function render_admin_page() {
