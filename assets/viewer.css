@@ -1,0 +1,111 @@
+.drevo-genealogy-tree {
+	border: 1px solid #d6d2c4;
+	background: #fffdf6;
+	margin: 24px 0;
+}
+
+.drevo-genealogy-toolbar {
+	align-items: center;
+	border-bottom: 1px solid #d6d2c4;
+	display: flex;
+	gap: 12px;
+	justify-content: space-between;
+	padding: 10px 12px;
+}
+
+.drevo-genealogy-title {
+	font-size: 16px;
+	line-height: 1.3;
+}
+
+.drevo-genealogy-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	justify-content: flex-end;
+}
+
+.drevo-genealogy-button {
+	background: #f2efe4;
+	border: 1px solid #beb7a1;
+	color: #2f2a1f;
+	cursor: pointer;
+	display: inline-flex;
+	font: inherit;
+	min-height: 40px;
+	align-items: center;
+	line-height: 1.2;
+	padding: 7px 10px;
+	text-decoration: none;
+}
+
+.drevo-genealogy-button:hover,
+.drevo-genealogy-button:focus {
+	background: #e9e2cf;
+	color: #111;
+}
+
+.drevo-genealogy-frame {
+	background: #fff;
+	display: block;
+	height: var(--drevo-tree-height, 75vh);
+	min-height: 420px;
+	width: 100%;
+}
+
+.drevo-genealogy-tree.is-expanded {
+	background: #fffdf6;
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	height: 100dvh;
+	inset: 0;
+	margin: 0;
+	position: fixed;
+	width: 100vw;
+	z-index: 999999;
+}
+
+.drevo-genealogy-tree:fullscreen {
+	background: #fffdf6;
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	margin: 0;
+	width: 100vw;
+}
+
+.drevo-genealogy-tree:fullscreen .drevo-genealogy-frame {
+	flex: 1;
+	height: auto;
+	min-height: 0;
+}
+
+.drevo-genealogy-tree.is-expanded .drevo-genealogy-frame {
+	flex: 1;
+	height: auto;
+	min-height: 0;
+}
+
+@media (max-width: 640px) {
+	.drevo-genealogy-toolbar {
+		align-items: stretch;
+		flex-direction: column;
+	}
+
+	.drevo-genealogy-actions {
+		justify-content: flex-start;
+	}
+
+	.drevo-genealogy-button {
+		justify-content: center;
+		min-height: 44px;
+		width: 100%;
+	}
+
+	.drevo-genealogy-frame {
+		height: 78vh;
+		min-height: 70vh;
+		min-height: 70dvh;
+	}
+}
