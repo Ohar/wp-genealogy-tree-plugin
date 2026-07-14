@@ -29,6 +29,9 @@
 		var frameWindow;
 		var drag = null;
 		var suppressClick = false;
+		var pointers = {};
+		var pinch = null;
+		var zoom = 1;
 
 		try {
 			frameDocument = frame.contentDocument;
@@ -42,10 +45,51 @@
 		}
 
 		frameDocument.documentElement.dataset.drevoDragScroll = 'enabled';
+		frameDocument.documentElement.style.touchAction = 'none';
+
+		function getPointerPair() {
+			var pointerIds = Object.keys(pointers);
+
+			if (pointerIds.length < 2) {
+				return null;
+			}
+
+			return [pointers[pointerIds[0]], pointers[pointerIds[1]]];
+		}
+
+		function getDistance(firstPointer, secondPointer) {
+			var x = secondPointer.x - firstPointer.x;
+			var y = secondPointer.y - firstPointer.y;
+
+			return Math.sqrt(x * x + y * y);
+		}
+
+		function clampZoom(value) {
+			return Math.max(0.5, Math.min(2.5, value));
+		}
+
+		function applyZoom(nextZoom, centerX, centerY) {
+			var documentX = (frameWindow.scrollX + centerX) / zoom;
+			var documentY = (frameWindow.scrollY + centerY) / zoom;
+
+			zoom = clampZoom(nextZoom);
+			frameDocument.documentElement.style.zoom = zoom;
+			frameWindow.scrollTo(documentX * zoom - centerX, documentY * zoom - centerY);
+		}
 
 		frameDocument.addEventListener('pointerdown', function (event) {
-			if (event.button !== 0 || isInteractiveElement(event.target)) {
+			if (event.button !== 0 || (event.pointerType !== 'touch' && isInteractiveElement(event.target))) {
 				return;
+			}
+
+			pointers[event.pointerId] = {
+				x: event.clientX,
+				y: event.clientY
+			};
+
+			if (getPointerPair()) {
+				drag = null;
+				pinch = null;
 			}
 
 			drag = {
@@ -65,6 +109,34 @@
 		frameDocument.addEventListener('pointermove', function (event) {
 			var deltaX;
 			var deltaY;
+			var pointerPair;
+			var distance;
+			var centerX;
+			var centerY;
+
+			if (pointers[event.pointerId]) {
+				pointers[event.pointerId].x = event.clientX;
+				pointers[event.pointerId].y = event.clientY;
+			}
+
+			pointerPair = getPointerPair();
+			if (pointerPair) {
+				distance = getDistance(pointerPair[0], pointerPair[1]);
+				centerX = (pointerPair[0].x + pointerPair[1].x) / 2;
+				centerY = (pointerPair[0].y + pointerPair[1].y) / 2;
+
+				if (!pinch) {
+					pinch = {
+						distance: distance,
+						zoom: zoom
+					};
+				} else if (pinch.distance > 0) {
+					applyZoom(pinch.zoom * distance / pinch.distance, centerX, centerY);
+				}
+
+				event.preventDefault();
+				return;
+			}
 
 			if (!drag || drag.pointerId !== event.pointerId) {
 				return;
@@ -82,6 +154,9 @@
 		});
 
 		frameDocument.addEventListener('pointerup', function (event) {
+			delete pointers[event.pointerId];
+			pinch = null;
+
 			if (!drag || drag.pointerId !== event.pointerId) {
 				return;
 			}
@@ -90,9 +165,20 @@
 			drag = null;
 		});
 
-		frameDocument.addEventListener('pointercancel', function () {
+		frameDocument.addEventListener('pointercancel', function (event) {
+			delete pointers[event.pointerId];
+			pinch = null;
 			drag = null;
 		});
+
+		frameDocument.addEventListener('wheel', function (event) {
+			if (!event.ctrlKey && !event.metaKey) {
+				return;
+			}
+
+			applyZoom(zoom * Math.exp(-event.deltaY * 0.0015), event.clientX, event.clientY);
+			event.preventDefault();
+		}, { passive: false });
 
 		frameDocument.addEventListener('click', function (event) {
 			if (!suppressClick) {
