@@ -3,7 +3,7 @@ Contributors: ohar
 Tags: genealogy, family tree, html import, shortcode
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 1.0.0
 License: MIT
 License URI: https://opensource.org/license/mit/
 
@@ -70,5 +70,5 @@ To remove imported data, delete the relevant folder under `wp-content/genealogy/
 
 == Changelog ==
 
-= 0.1.0 =
+= 1.0.0 =
 * Initial release.

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Drevo Genealogy Trees
  * Description: Uploads static genealogy HTML exports as isolated packages and renders them via shortcode.
- * Version: 0.1.0
+ * Version: 1.0.0
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * Author: Ohar <code@ohar.name>
@@ -58,7 +58,7 @@ final class Drevo_Genealogy_Trees {
 
 	public function register_assets() {
 		$base_url = plugin_dir_url( __FILE__ );
-		$version  = '0.1.0';
+		$version  = '1.0.0';
 
 		wp_register_style(
 			'drevo-genealogy-viewer',
